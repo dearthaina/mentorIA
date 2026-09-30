@@ -2,8 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Usuario
-
+from models import Usuario, Documento
 app = FastAPI()
 
 
@@ -108,3 +107,109 @@ def deletar_usuario(id_usuario: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"mensagem": "Usuário deletado com sucesso"}
+
+
+
+
+
+
+@app.post("/documentos")
+def criar_documento(
+    id_usuario: int,
+    nome_arquivo: str,
+    caminho_arquivo: str,
+    db: Session = Depends(get_db)
+):
+    documento = Documento(
+        id_usuario=id_usuario,
+        nome_arquivo=nome_arquivo,
+        caminho_arquivo=caminho_arquivo
+    )
+
+    db.add(documento)
+    db.commit()
+    db.refresh(documento)
+
+    return {
+        "id_documento": documento.id_documento,
+        "id_usuario": documento.id_usuario,
+        "nome_arquivo": documento.nome_arquivo,
+        "caminho_arquivo": documento.caminho_arquivo
+    }
+
+@app.get("/documentos")
+def listar_documentos(db: Session = Depends(get_db)):
+    documentos = db.query(Documento).all()
+
+    return [
+        {
+            "id_documento": documento.id_documento,
+            "id_usuario": documento.id_usuario,
+            "nome_arquivo": documento.nome_arquivo,
+            "caminho_arquivo": documento.caminho_arquivo
+        }
+        for documento in documentos
+    ]
+@app.get("/documentos/{id_documento}")
+def buscar_documento(
+    id_documento: int,
+    db: Session = Depends(get_db)
+):
+    documento = db.query(Documento).filter(
+        Documento.id_documento == id_documento
+    ).first()
+
+    if not documento:
+        return {"mensagem": "Documento não encontrado"}
+
+    return {
+        "id_documento": documento.id_documento,
+        "id_usuario": documento.id_usuario,
+        "nome_arquivo": documento.nome_arquivo,
+        "caminho_arquivo": documento.caminho_arquivo
+    }
+@app.put("/documentos/{id_documento}")
+def atualizar_documento(
+    id_documento: int,
+    id_usuario: int,
+    nome_arquivo: str,
+    caminho_arquivo: str,
+    db: Session = Depends(get_db)
+):
+    documento = db.query(Documento).filter(
+        Documento.id_documento == id_documento
+    ).first()
+
+    if not documento:
+        return {"mensagem": "Documento não encontrado"}
+
+    documento.id_usuario = id_usuario
+    documento.nome_arquivo = nome_arquivo
+    documento.caminho_arquivo = caminho_arquivo
+
+    db.commit()
+    db.refresh(documento)
+
+    return {
+        "id_documento": documento.id_documento,
+        "id_usuario": documento.id_usuario,
+        "nome_arquivo": documento.nome_arquivo,
+        "caminho_arquivo": documento.caminho_arquivo
+    }
+
+@app.delete("/documentos/{id_documento}")
+def deletar_documento(
+    id_documento: int,
+    db: Session = Depends(get_db)
+):
+    documento = db.query(Documento).filter(
+        Documento.id_documento == id_documento
+    ).first()
+
+    if not documento:
+        return {"mensagem": "Documento não encontrado"}
+
+    db.delete(documento)
+    db.commit()
+
+    return {"mensagem": "Documento deletado com sucesso"}

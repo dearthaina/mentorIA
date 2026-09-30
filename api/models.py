@@ -13,3 +13,13 @@ class Usuario(Base):
     email = Column(String(150), unique=True, nullable=False)
     senha_hash = Column(String(255), nullable=False)
     data_cadastro = Column(DateTime, server_default=func.now())
+
+
+class Documento(Base):
+    __tablename__ = "documento"
+
+    id_documento = Column(Integer, primary_key=True)
+    id_usuario = Column(Integer, nullable=False)
+    nome_arquivo = Column(String(255), nullable=False)
+    caminho_arquivo = Column(String(500), nullable=False)
+    data_upload = Column(DateTime, server_default=func.now())
