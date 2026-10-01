@@ -43,6 +43,7 @@ mentorIA/
 │
 ├── database/
 │   └── schema.sql
+│   └── inserts.sql
 │
 ├── requirements.txt
 ├── .env
@@ -150,43 +151,43 @@ No Swagger é possível realizar os testes de:
 
 ## Usuários
 
-| Método | Endpoint                 | Função            |
-| ------ | ________________________ | _________________ |
-| POST   | `/usuarios`              | Criar usuário     |
-| GET    | `/usuarios`              | Listar usuários   |
-| GET    | `/usuarios/{id_usuario}` | Consultar usuário |
-| PUT    | `/usuarios/{id_usuario}` | Atualizar usuário |
-| DELETE | `/usuarios/{id_usuario}` | Excluir usuário   |
+| Método | Endpoint | Função |
+| ------ | -------- | ------ |
+| POST | `/usuarios` | Criar usuário |
+| GET | `/usuarios` | Listar usuários |
+| GET | `/usuarios/{id_usuario}` | Consultar usuário |
+| PUT | `/usuarios/{id_usuario}` | Atualizar usuário |
+| DELETE | `/usuarios/{id_usuario}` | Excluir usuário |
 
 ## Documentos
 
-| Método | Endpoint                     | Função              |
-| ------ | _____________________________| ___________________ |
-| POST   | `/documentos`                | Criar documento     |
-| GET    | `/documentos`                | Listar documentos   |
-| GET    | `/documentos/{id_documento}` | Consultar documento |
-| PUT    | `/documentos/{id_documento}` | Atualizar documento |
-| DELETE | `/documentos/{id_documento}` | Excluir documento   |
+| Método | Endpoint | Função |
+| ------ | -------- | ------ |
+| POST | `/documentos` | Criar documento |
+| GET | `/documentos` | Listar documentos |
+| GET | `/documentos/{id_documento}` | Consultar documento |
+| PUT | `/documentos/{id_documento}` | Atualizar documento |
+| DELETE | `/documentos/{id_documento}` | Excluir documento |
 
 ## Conversas
 
-| Método | Endpoint                   | Função             |
-| ------ | __________________________ | __________________ |
-| POST   | `/conversas`               | Criar conversa     |
-| GET    | `/conversas`               | Listar conversas   |
-| GET    | `/conversas/{id_conversa}` | Consultar conversa |
-| PUT    | `/conversas/{id_conversa}` | Atualizar conversa |
-| DELETE | `/conversas/{id_conversa}` | Excluir conversa   |
+| Método | Endpoint | Função |
+| ------ | -------- | ------ |
+| POST | `/conversas` | Criar conversa |
+| GET | `/conversas` | Listar conversas |
+| GET | `/conversas/{id_conversa}` | Consultar conversa |
+| PUT | `/conversas/{id_conversa}` | Atualizar conversa |
+| DELETE | `/conversas/{id_conversa}` | Excluir conversa |
 
 ## Mensagens
 
-| Método | Endpoint                   | Função             |
-| ------ | __________________________ | __________________ |
-| POST   | `/mensagens`               | Criar mensagem     |
-| GET    | `/mensagens`               | Listar mensagens   |
-| GET    | `/mensagens/{id_mensagem}` | Consultar mensagem |
-| PUT    | `/mensagens/{id_mensagem}` | Atualizar mensagem |
-| DELETE | `/mensagens/{id_mensagem}` | Excluir mensagem   |
+| Método | Endpoint | Função |
+| ------ | -------- | ------ |
+| POST | `/mensagens` | Criar mensagem |
+| GET | `/mensagens` | Listar mensagens |
+| GET | `/mensagens/{id_mensagem}` | Consultar mensagem |
+| PUT | `/mensagens/{id_mensagem}` | Atualizar mensagem |
+| DELETE | `/mensagens/{id_mensagem}` | Excluir mensagem |
 
 # Banco de dados
 
