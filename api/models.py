@@ -37,3 +37,12 @@ class Conversa(Base):
         DateTime,
         server_default=func.now()
     )
+
+class Mensagem(Base):
+    __tablename__ = "mensagem"
+
+    id_mensagem = Column(Integer, primary_key=True)
+    id_conversa = Column(Integer, nullable=False)
+    origem = Column(String(20), nullable=False)
+    conteudo = Column(String, nullable=False)
+    data_envio = Column(DateTime, server_default=func.now())

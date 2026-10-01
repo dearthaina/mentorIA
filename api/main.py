@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Usuario, Documento, Conversa
+from models import Usuario, Documento, Conversa, Mensagem
 
 app = FastAPI()
 
@@ -365,3 +365,139 @@ def deletar_conversa(
     db.commit()
 
     return {"mensagem": "Conversa deletada com sucesso"}
+
+
+@app.post("/mensagens")
+def criar_mensagem(
+    id_conversa: int,
+    origem: str,
+    conteudo: str,
+    db: Session = Depends(get_db)
+):
+    mensagem = Mensagem(
+        id_conversa=id_conversa,
+        origem=origem,
+        conteudo=conteudo
+    )
+
+    try:
+        db.add(mensagem)
+        db.commit()
+        db.refresh(mensagem)
+
+        return {
+            "id_mensagem": mensagem.id_mensagem,
+            "id_conversa": mensagem.id_conversa,
+            "origem": mensagem.origem,
+            "conteudo": mensagem.conteudo,
+            "data_envio": mensagem.data_envio
+        }
+
+    except Exception as erro:
+        db.rollback()
+        return {
+            "erro": "Não foi possível criar a mensagem",
+            "detalhes": str(erro)
+        }
+
+
+@app.get("/mensagens")
+def listar_mensagens(db: Session = Depends(get_db)):
+    mensagens = db.query(Mensagem).all()
+
+    return [
+        {
+            "id_mensagem": mensagem.id_mensagem,
+            "id_conversa": mensagem.id_conversa,
+            "origem": mensagem.origem,
+            "conteudo": mensagem.conteudo,
+            "data_envio": mensagem.data_envio
+        }
+        for mensagem in mensagens
+    ]
+
+
+@app.get("/mensagens/{id_mensagem}")
+def buscar_mensagem(
+    id_mensagem: int,
+    db: Session = Depends(get_db)
+):
+    mensagem = db.query(Mensagem).filter(
+        Mensagem.id_mensagem == id_mensagem
+    ).first()
+
+    if not mensagem:
+        return {"mensagem": "Mensagem não encontrada"}
+
+    return {
+        "id_mensagem": mensagem.id_mensagem,
+        "id_conversa": mensagem.id_conversa,
+        "origem": mensagem.origem,
+        "conteudo": mensagem.conteudo,
+        "data_envio": mensagem.data_envio
+    }
+
+
+@app.put("/mensagens/{id_mensagem}")
+def atualizar_mensagem(
+    id_mensagem: int,
+    id_conversa: int,
+    origem: str,
+    conteudo: str,
+    db: Session = Depends(get_db)
+):
+    mensagem = db.query(Mensagem).filter(
+        Mensagem.id_mensagem == id_mensagem
+    ).first()
+
+    if not mensagem:
+        return {"mensagem": "Mensagem não encontrada"}
+
+    mensagem.id_conversa = id_conversa
+    mensagem.origem = origem
+    mensagem.conteudo = conteudo
+
+    try:
+        db.commit()
+        db.refresh(mensagem)
+
+        return {
+            "id_mensagem": mensagem.id_mensagem,
+            "id_conversa": mensagem.id_conversa,
+            "origem": mensagem.origem,
+            "conteudo": mensagem.conteudo,
+            "data_envio": mensagem.data_envio
+        }
+
+    except Exception as erro:
+        db.rollback()
+        return {
+            "erro": "Não foi possível atualizar a mensagem",
+            "detalhes": str(erro)
+        }
+
+
+@app.delete("/mensagens/{id_mensagem}")
+def deletar_mensagem(
+    id_mensagem: int,
+    db: Session = Depends(get_db)
+):
+    mensagem = db.query(Mensagem).filter(
+        Mensagem.id_mensagem == id_mensagem
+    ).first()
+
+    if not mensagem:
+        return {"mensagem": "Mensagem não encontrada"}
+
+    try:
+        db.delete(mensagem)
+        db.commit()
+
+        return {"mensagem": "Mensagem deletada com sucesso"}
+
+    except Exception as erro:
+        db.rollback()
+        return {
+            "erro": "Não foi possível deletar a mensagem",
+            "detalhes": str(erro)
+        }
