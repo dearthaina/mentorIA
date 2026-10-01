@@ -23,3 +23,17 @@ class Documento(Base):
     nome_arquivo = Column(String(255), nullable=False)
     caminho_arquivo = Column(String(500), nullable=False)
     data_upload = Column(DateTime, server_default=func.now())
+
+
+class Conversa(Base):
+    __tablename__ = "conversa"
+
+    id_conversa = Column(Integer, primary_key=True)
+    id_usuario = Column(Integer, nullable=False)
+    id_documento = Column(Integer, nullable=False)
+    titulo = Column(String(150), nullable=False)
+    data_criacao = Column(DateTime, server_default=func.now())
+    data_atualizacao = Column(
+        DateTime,
+        server_default=func.now()
+    )

@@ -2,7 +2,8 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Usuario, Documento
+from models import Usuario, Documento, Conversa
+
 app = FastAPI()
 
 
@@ -10,6 +11,10 @@ app = FastAPI()
 def raiz():
     return {"mensagem": "API MentorIA funcionando!"}
 
+
+# =========================
+# USUÁRIOS
+# =========================
 
 @app.post("/usuarios")
 def criar_usuario(
@@ -36,6 +41,8 @@ def criar_usuario(
         "nome": usuario.nome,
         "email": usuario.email
     }
+
+
 @app.get("/usuarios")
 def listar_usuarios(db: Session = Depends(get_db)):
     usuarios = db.query(Usuario).all()
@@ -49,8 +56,13 @@ def listar_usuarios(db: Session = Depends(get_db)):
         }
         for usuario in usuarios
     ]
+
+
 @app.get("/usuarios/{id_usuario}")
-def buscar_usuario(id_usuario: int, db: Session = Depends(get_db)):
+def buscar_usuario(
+    id_usuario: int,
+    db: Session = Depends(get_db)
+):
     usuario = db.query(Usuario).filter(
         Usuario.id_usuario == id_usuario
     ).first()
@@ -64,6 +76,8 @@ def buscar_usuario(id_usuario: int, db: Session = Depends(get_db)):
         "nome": usuario.nome,
         "email": usuario.email
     }
+
+
 @app.put("/usuarios/{id_usuario}")
 def atualizar_usuario(
     id_usuario: int,
@@ -94,8 +108,13 @@ def atualizar_usuario(
         "nome": usuario.nome,
         "email": usuario.email
     }
+
+
 @app.delete("/usuarios/{id_usuario}")
-def deletar_usuario(id_usuario: int, db: Session = Depends(get_db)):
+def deletar_usuario(
+    id_usuario: int,
+    db: Session = Depends(get_db)
+):
     usuario = db.query(Usuario).filter(
         Usuario.id_usuario == id_usuario
     ).first()
@@ -109,9 +128,9 @@ def deletar_usuario(id_usuario: int, db: Session = Depends(get_db)):
     return {"mensagem": "Usuário deletado com sucesso"}
 
 
-
-
-
+# =========================
+# DOCUMENTOS
+# =========================
 
 @app.post("/documentos")
 def criar_documento(
@@ -137,6 +156,7 @@ def criar_documento(
         "caminho_arquivo": documento.caminho_arquivo
     }
 
+
 @app.get("/documentos")
 def listar_documentos(db: Session = Depends(get_db)):
     documentos = db.query(Documento).all()
@@ -150,6 +170,8 @@ def listar_documentos(db: Session = Depends(get_db)):
         }
         for documento in documentos
     ]
+
+
 @app.get("/documentos/{id_documento}")
 def buscar_documento(
     id_documento: int,
@@ -168,6 +190,8 @@ def buscar_documento(
         "nome_arquivo": documento.nome_arquivo,
         "caminho_arquivo": documento.caminho_arquivo
     }
+
+
 @app.put("/documentos/{id_documento}")
 def atualizar_documento(
     id_documento: int,
@@ -197,6 +221,7 @@ def atualizar_documento(
         "caminho_arquivo": documento.caminho_arquivo
     }
 
+
 @app.delete("/documentos/{id_documento}")
 def deletar_documento(
     id_documento: int,
@@ -213,3 +238,130 @@ def deletar_documento(
     db.commit()
 
     return {"mensagem": "Documento deletado com sucesso"}
+
+
+# =========================
+# CONVERSAS
+# =========================
+
+@app.post("/conversas")
+def criar_conversa(
+    id_usuario: int,
+    id_documento: int,
+    titulo: str,
+    db: Session = Depends(get_db)
+):
+    conversa = Conversa(
+        id_usuario=id_usuario,
+        id_documento=id_documento,
+        titulo=titulo
+    )
+
+    try:
+        db.add(conversa)
+        db.commit()
+        db.refresh(conversa)
+
+        return {
+            "id_conversa": conversa.id_conversa,
+            "id_usuario": conversa.id_usuario,
+            "id_documento": conversa.id_documento,
+            "titulo": conversa.titulo,
+            "data_criacao": conversa.data_criacao,
+            "data_atualizacao": conversa.data_atualizacao
+        }
+
+    except Exception as erro:
+        db.rollback()
+
+        return {
+            "erro": "Não foi possível criar a conversa",
+            "detalhes": str(erro)
+        }
+
+
+@app.get("/conversas")
+def listar_conversas(db: Session = Depends(get_db)):
+    conversas = db.query(Conversa).all()
+
+    return [
+        {
+            "id_conversa": conversa.id_conversa,
+            "id_usuario": conversa.id_usuario,
+            "id_documento": conversa.id_documento,
+            "titulo": conversa.titulo,
+            "data_criacao": conversa.data_criacao,
+            "data_atualizacao": conversa.data_atualizacao
+        }
+        for conversa in conversas
+    ]
+
+
+@app.get("/conversas/{id_conversa}")
+def buscar_conversa(
+    id_conversa: int,
+    db: Session = Depends(get_db)
+):
+    conversa = db.query(Conversa).filter(
+        Conversa.id_conversa == id_conversa
+    ).first()
+
+    if not conversa:
+        return {"mensagem": "Conversa não encontrada"}
+
+    return {
+        "id_conversa": conversa.id_conversa,
+        "id_usuario": conversa.id_usuario,
+        "id_documento": conversa.id_documento,
+        "titulo": conversa.titulo,
+        "data_criacao": conversa.data_criacao,
+        "data_atualizacao": conversa.data_atualizacao
+    }
+
+@app.put("/conversas/{id_conversa}")
+def atualizar_conversa(
+    id_conversa: int,
+    id_usuario: int,
+    id_documento: int,
+    titulo: str,
+    db: Session = Depends(get_db)
+):
+    conversa = db.query(Conversa).filter(
+        Conversa.id_conversa == id_conversa
+    ).first()
+
+    if not conversa:
+        return {"mensagem": "Conversa não encontrada"}
+
+    conversa.id_usuario = id_usuario
+    conversa.id_documento = id_documento
+    conversa.titulo = titulo
+
+    db.commit()
+    db.refresh(conversa)
+
+    return {
+        "id_conversa": conversa.id_conversa,
+        "id_usuario": conversa.id_usuario,
+        "id_documento": conversa.id_documento,
+        "titulo": conversa.titulo,
+        "data_criacao": conversa.data_criacao,
+        "data_atualizacao": conversa.data_atualizacao
+    }
+
+@app.delete("/conversas/{id_conversa}")
+def deletar_conversa(
+    id_conversa: int,
+    db: Session = Depends(get_db)
+):
+    conversa = db.query(Conversa).filter(
+        Conversa.id_conversa == id_conversa
+    ).first()
+
+    if not conversa:
+        return {"mensagem": "Conversa não encontrada"}
+
+    db.delete(conversa)
+    db.commit()
+
+    return {"mensagem": "Conversa deletada com sucesso"}

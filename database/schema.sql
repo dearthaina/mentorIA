@@ -39,3 +39,4 @@ CREATE TABLE mensagem (
   CONSTRAINT fk_mensagem_conversa FOREIGN KEY (id_conversa) REFERENCES conversa(id_conversa),
   CONSTRAINT chk_origem_mensagem CHECK (origem IN ('usuario', 'ia'))
 );
+
